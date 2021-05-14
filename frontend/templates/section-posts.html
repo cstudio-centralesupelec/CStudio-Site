@@ -67,7 +67,6 @@
 
 	async function load_posts(query){
 		let results = await search_posts(query);
-		console.log(results);
 		app_data.posts = results;
 		app_data.loading = false;
 	}
@@ -83,7 +82,7 @@
 			// Highlight only if the language is valid.
 			// highlight.js escapes HTML in the code, but we need to escape by ourselves
 			// when we don't use it.
-			const highlighted = validLang ? hljs.highlight(language, code).value : code;
+			const highlighted = validLang ? hljs.highlight(code,{language:language}).value : code;
 
 			// Render the highlighted code with `hljs` class.
 			return `<pre><code class="hljs ${language}">${highlighted}</code></pre>`;

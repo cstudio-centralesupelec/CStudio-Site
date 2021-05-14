@@ -39,7 +39,7 @@ if(!config.debug){
 	// full https security.
 	let redirection_server = http.createServer((req,res) => {
 		res.writeHead(302, {
-		  'Location': `https://${config.hostname}:${config.port}${req.url}`
+		  'Location': `${config.hostname}:${config.port}${req.url}`
 		});
 		res.end();
 	});

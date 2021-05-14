@@ -18,7 +18,7 @@ app.use((req,res,next) => {
 			return;
 		}
 
-		let data = "grant_type=authorization_code&code=" + code + "&redirect_uri=" + encodeURIComponent("http://"+config.hostname+"/q");
+		let data = "grant_type=authorization_code&code=" + code + "&redirect_uri=" + encodeURIComponent(config.hostname+"/q");
 		data += "&client_id=" + config.oauth_client_id;
 		data += "&client_secret=" + config.oauth_client_secret;
 
