@@ -32,14 +32,16 @@ require('./server/routes.js'); // setup routes
 app.use(vw.api());
 
 let server = null;
+let port_default = 80;
 
-if(config.debug){
+if(!config.debug){
+	port_default = 443;
 	// full https security.
 	let redirection_server = http.createServer((req,res) => {
-		response.writeHead(302, {
+		res.writeHead(302, {
 		  'Location': `https://${config.hostname}:${config.port}${req.url}`
 		});
-		response.end();
+		res.end();
 	});
 
 	const options = {
@@ -47,6 +49,8 @@ if(config.debug){
 		cert: fs.readFileSync('cert/cert.pem')
 	};
 	server = https.createServer(options,app);
+
+	console.log("r s");
 	redirection_server.listen(80, config.host || "0.0.0.0");
 
 }else{
@@ -54,6 +58,6 @@ if(config.debug){
 	server = http.createServer(app);
 }
 
-server.listen(config.port || 443,config.host || "0.0.0.0",() => {
+server.listen(config.port || port_default,config.host || "0.0.0.0",() => {
 	console.log(`Website available at http://${config.hostname}:${config.port}/`)
 });
