@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="fr" class='h-100 w-100'>
+@include{templates/head.html}
+<body class='d-flex flex-column h-100 w-100 bg-light'>
+	<div id="app" class='flex-shrink-0'> <!-- vue stuff is only inside this div. -->
+		@include{templates/headers.html}
+	</div>
+	<div id="app2" class='w-80 px-5'>
+		<div class='row'>
+			<div class='col'>
+				
+			</div>
+			<div class='col'>
+				<h2>Aperçu</h2>
+			</div>
+		</div>
+		
+		<div class='row'>
+			<div class='col'>
+				<input type="text" class="" v-model="postTitle" placeholder="Titre de l'article"/> <br/>
+			</div>
+			<div class='col'>
+				<h1 class='text-center'> {{ postTitle || "Titre" }}</h1>
+				<div>
+					Par <em>{{ d.username }}</em>
+				</div>
+			</div>
+		</div>
+
+		<div class='row'>
+			<div class='col'>
+				<markdown v-model="postContent"></markdown>
+			</div>
+			<div class='col'>
+				<div v-html="marked(escape_html(postContent))"></div>
+			</div>
+		</div>
+
+		<div class='row'>
+			<div class='col'>
+				<button class='btn btn-primary' onClick="publish();">Publier</button>
+			</div>
+			<div>
+
+			</div>
+		</div>
+	</div>
+	<script>
+		location.hash = "#new_post";
+		window.onhashchange = () => {
+			// go back to index.
+			if(location.hash !== "#new_post"){
+				location.href = location.origin + "/" + location.hash;
+			}
+		}
+	</script>
+	@include{templates/footer.html}
+	<script>
+		let app_data2 = {};
+		app_data2.postTitle = ""; // max length = 70.
+		app_data2.postContent = "";
+		app_data2.d = app_data;
+
+
+		let app2 = new Vue({
+			el: '#app2',
+			data: app_data2,
+		});
+
+		async function publish(){
+			let data = await create_post(app_data2.postTitle,app_data2.postContent);
+			if(!data.error){
+				location.href= "/#my";
+			}
+		}
+
+	</script>
+</body>
+</html>

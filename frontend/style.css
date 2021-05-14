@@ -16,6 +16,14 @@ header{
 	margin-top:10px;
 	overflow: auto;
 }
+button a{
+	color:inherit;
+	text-decoration:inherit;
+}
+button a:hover{
+	color:inherit;
+	text-decoration:inherit;
+}
 img{
 	image-rendering:pixelated;
 }
@@ -33,9 +41,22 @@ nav{
 header > *{
 	margin:10px;
 }
-header > h1{
-	padding-top:10px;
+header > nav > h1{
+	padding-right:20px;
 }
+
+/* Computers */
+.var-size {
+	font-size: 1.25rem;
+}
+
+/* Phones and tablets */
+@media (max-width: 768px) {
+  .var-size {
+    font-size: 1rem;
+  }
+}
+
 nav a{
 	margin:10px;
 	padding-top:6px;
@@ -56,7 +77,8 @@ nav a:hover{
 textarea.markdown{
 	resize:none;
 	width:80%;
-	min-height:300px;
+	min-height:100px;
+	overflow-y:hidden;
 }
 .post_card{
 	margin:10px;

@@ -5,12 +5,31 @@ if(window["app_data"] === undefined){
 
 location.hash = location.hash || "main";
 
+
 app_data.login = false;
 app_data.username = "";
 app_data = {
 	...app_data,
-	get page_content() { return location.hash.substring(1); },
-  	set page_content(val) { location.hash = val; },
+	get show_post(){
+		let arr = location.hash.substring(1).split("#",2);
+		if(arr.length == 1 || isNaN(arr[1])){ return -1; }
+		return parseInt(arr[1])
+	},
+	set show_post(val){
+		let arr = location.hash.substring(1).split("#",2);
+		if(val == -1){
+			location.hash = arr[0]; return;
+		}
+		location.hash = arr[0] + "#" + val;
+	},
+	get page_content() {
+		return location.hash.substring(1).split("#",2)[0];
+	},
+  	set page_content(val) {
+  		let arr = location.hash.substring(1).split("#",2);
+  		arr[0] = val;
+  		location.hash = arr.join("#");
+  	},
 }
 
 load_user_info();
@@ -20,6 +39,10 @@ let app = new Vue({
 	el: '#app',
 	data: app_data
 });
+
+if(app.show_post != -1){
+	showPost(app.show_post);
+}
 
 function login(){
 	let redirect_url = encodeURIComponent(`${location.origin}/q`);

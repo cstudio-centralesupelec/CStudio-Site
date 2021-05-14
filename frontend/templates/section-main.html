@@ -5,6 +5,22 @@
 	</article>
 	<div class="b-example-divider"></div>
 	<article class='px-4 py-5 my-5 text-center bg-white'>
-		<h2>Posts récents</h2>
+		<h2>Articles récents</h2>
+
+		<post v-bind:post="post" v-for='post in recent_posts'></post>
+
 	</article>
 </section>
+<script>
+	"use strict";
+	window['app_data'] = window['app_data'] || {};
+	app_data.recent_posts = [];
+
+	async function loadRecentPosts(){
+		let posts = await recent_posts(0);
+		console.log(posts);
+		app_data.recent_posts = posts;
+		console.log(app_data.recent_posts);
+	}
+	loadRecentPosts();
+</script>

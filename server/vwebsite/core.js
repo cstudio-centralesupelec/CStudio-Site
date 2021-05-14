@@ -56,6 +56,7 @@ class VWebsite{
 
 						let argument_object = {};
 
+						console.log(req.session);
 						// Check if the request is valid.
 						for(let varname in curr.variables){
 							let provided = null;
@@ -68,7 +69,7 @@ class VWebsite{
 
 
 							if(provided === null){
-								res.write("{error:'Variable "+varname+" is missing'}");
+								res.write("{'error':'Variable "+varname+" is missing'}");
 								res.end();
 								return;
 							}
@@ -77,11 +78,11 @@ class VWebsite{
 							// protect ourselfs from people sending big queries trying to overload us.
 							if(typeof provided === "string"){
 								if(typeof curr.variables[varname].maxlength === "number" && provided.length > curr.variables[varname].maxlength){
-									res.write("{error:'Variable "+varname+" is malformed'}");
+									res.write('{"error":"Variable '+varname+' is malformed"}');
 									return;
 								}
 								if(typeof curr.variables[varname].minlength === "number" && provided.length < curr.variables[varname].minlength){
-									res.write("{error:'Variable "+varname+" is malformed'}");
+									res.write('{"error":"Variable '+varname+' is malformed"}');
 									return;
 								}
 							}
@@ -95,13 +96,13 @@ class VWebsite{
 							}
 
 							if(typeof provided === "undefined"){
-								res.write("{error:'Variable "+varname+" is malformed'}");
+								res.write('{"error":"Variable '+varname+' is malformed"}');
 								res.end();
 								return;
 							}
 
 							if(curr.variables[varname].type !== undefined && typeof provided !== curr.variables[varname].type){
-								res.write("{error:'Variable "+varname+" is malformed'}");
+								res.write('{"error":"Variable '+varname+' is malformed"}');
 								res.end();
 								return;
 							}
@@ -122,7 +123,11 @@ class VWebsite{
 
 	}
 	endpoint(name,variables,handler,description){
-		this.routes[name] = {variables,handler,description};
+		if(handler === undefined){
+			this.routes[name] = variables;
+		}else{
+			this.routes[name] = {variables,handler,description};
+		}
 	}
 	compile(){
 		// generate JS file based on the endpoints provided.
@@ -155,8 +160,10 @@ class VWebsite{
 
 		for(let endpoint_name in this.routes){
 			let endpoint = this.routes[endpoint_name];
-			endpoint.vars = endpoint.vars || {};
-			let ep_arguments = Object.keys(endpoint.variables);
+			endpoint.variables = endpoint.variables || {};
+			let ep_arguments = Object.keys(endpoint.variables).filter((e) => {
+				return endpoint.variables[e].provider !== "session"
+			});
 			if(endpoint.post){
 				ep_arguments.push('post_data');
 			}
@@ -228,8 +235,10 @@ let data = await ${endpoint_name}(${ep_arguments.join(',')});
 
 			current_js_function += "	let result = await get_website('"+this.url+"?type="+endpoint_name;
 
-			for(let arg in endpoint.vars){
-				current_js_function += "&" + arg + "=" + "'+"+arg+"+'";
+			for(let arg in endpoint.variables){
+				if(endpoint.variables[arg].provider !== 'session'){
+					current_js_function += "&" + arg + "=" + "'+"+arg+"+'";
+				}
 			}
 
 			current_js_function += "'";
