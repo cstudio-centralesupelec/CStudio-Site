@@ -1,0 +1,13 @@
+<section v-if="page_content === 'posts'" class='container'>
+	<input type="text" placeholder="Rechercher un article"/>
+
+	<post v-bind:post="post" v-for='post in posts'></post>
+</section>
+<script>
+	window['app_data'] = window['app_data'] || {};
+	window['app_data'].posts = [
+		{content:"Présentation de p5.js",author:"Humain A"},
+		{content:"Faire un FPS avec Unity",author:"Humain B"},
+		{content:"Utiliser les framebuffers avec OpenGL",author:"Humain C"},
+	]
+</script>

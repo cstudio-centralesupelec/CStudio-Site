@@ -1,0 +1,22 @@
+<header>
+
+	<nav class='navbar navbar-expand-md'>
+		<h1>CStudio</h1>
+		<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarid" aria-controls="navbarsExample04" aria-expanded="false" aria-label="Toggle navigation">
+		<i class="fa fa-bars"></i>
+		</button>
+		<div class="collapse navbar-collapse" id="navbarid">
+			<div class='navbar-nav align-items-center'>
+				<div class='nav-item'><a v-bind:class="page_content == 'main' ? 'selected': ''" v-on:click="page_content = 'main'">accueil</a></div>
+				<div class='nav-item'><a v-bind:class="page_content == 'posts' ? 'selected': ''" v-on:click="page_content = 'posts'">articles</a></div>
+				<div class='nav-item'><a v-bind:class="page_content == 'games' ? 'selected': ''" v-on:click="page_content = 'games'">jeux</a></div>
+				<div class='nav-item'><a v-bind:class="page_content == 'about' ? 'selected': ''" v-on:click="page_content = 'about'">à propos</a></div>
+				<div v-if="!login" class='nav-item'><button class='btn btn-primary' onclick="login();">Connexion via VR</button></div>
+				
+				<div class='nav-item' v-else>
+					<a class="nav-link" v-on:click="page_content = 'my'">{{ username }}</a>
+				</div>
+			</div>
+		</div>
+	</nav>
+</header>

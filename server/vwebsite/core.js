@@ -59,6 +59,7 @@ class VWebsite{
 						// Check if the request is valid.
 						for(let varname in curr.variables){
 							let provided = null;
+
 							if(curr.variables[varname].provider === "session"){
 								provided = req.session[varname];
 							}else{
@@ -76,11 +77,11 @@ class VWebsite{
 							// protect ourselfs from people sending big queries trying to overload us.
 							if(typeof provided === "string"){
 								if(typeof curr.variables[varname].maxlength === "number" && provided.length > curr.variables[varname].maxlength){
-									send_error(res,'bad '+varname);
+									res.write("{error:'Variable "+varname+" is malformed'}");
 									return;
 								}
 								if(typeof curr.variables[varname].minlength === "number" && provided.length < curr.variables[varname].minlength){
-									send_error(res,'bad '+varname);
+									res.write("{error:'Variable "+varname+" is malformed'}");
 									return;
 								}
 							}
@@ -93,7 +94,13 @@ class VWebsite{
 								}
 							}
 
-							if(typeof provided !== curr.variables[varname].type){
+							if(typeof provided === "undefined"){
+								res.write("{error:'Variable "+varname+" is malformed'}");
+								res.end();
+								return;
+							}
+
+							if(curr.variables[varname].type !== undefined && typeof provided !== curr.variables[varname].type){
 								res.write("{error:'Variable "+varname+" is malformed'}");
 								res.end();
 								return;

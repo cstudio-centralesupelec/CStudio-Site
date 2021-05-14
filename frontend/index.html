@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="fr" class='h-100 w-100'>
+@include{templates/head.html}
+<body class='d-flex flex-column h-100 w-100 bg-light'>
+	<div id="app" class='flex-shrink-0'> <!-- vue stuff is only inside this div. -->
+		@include{templates/headers.html}
+		<div>
+			@include{templates/section-main.html}
+			@include{templates/section-posts.html}
+			@include{templates/section-games.html}
+			@include{templates/section-about.html}
+			@include{templates/section-my.html}
+
+		</div>
+	</div>
+	@include{templates/footer.html}
+</body>
+</html>
