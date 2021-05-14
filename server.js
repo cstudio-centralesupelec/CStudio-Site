@@ -4,6 +4,10 @@ const SQLiteStore = require('connect-sqlite3')(session);
 const Vwebsite = require('./server/vwebsite/core.js');
 const config = require('./config.js');
 
+const https = require('https');
+const http = require('http');
+const fs = require('fs');
+
 global.vw = new Vwebsite({debug:config.debug || false});
 global.app = express();
 global.config = config;
