@@ -7,7 +7,9 @@
 	<article class='px-4 py-5 my-5 text-center bg-white'>
 		<h2>Articles récents</h2>
 
-		<post v-bind:post="post" v-for='post in recent_posts'></post>
+		<div class='post-holder'>
+			<post v-bind:post="post" v-for='post in recent_posts'></post>
+		</div>
 
 	</article>
 </section>
@@ -16,11 +18,9 @@
 	window['app_data'] = window['app_data'] || {};
 	app_data.recent_posts = [];
 
-	async function loadRecentPosts(){
+	async function loadRecentPosts(storage){
 		let posts = await recent_posts(0);
-		console.log(posts);
-		app_data.recent_posts = posts;
-		console.log(app_data.recent_posts);
+		app_data[storage] = posts;
 	}
-	loadRecentPosts();
+	loadRecentPosts("recent_posts");
 </script>

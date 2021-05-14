@@ -8,27 +8,28 @@ location.hash = location.hash || "main";
 
 app_data.login = false;
 app_data.username = "";
+app_data.user_id = -1;
 app_data = {
 	...app_data,
 	get show_post(){
-		let arr = location.hash.substring(1).split("#",2);
+		let arr = location.hash.substring(1).split(",",2);
 		if(arr.length == 1 || isNaN(arr[1])){ return -1; }
 		return parseInt(arr[1])
 	},
 	set show_post(val){
-		let arr = location.hash.substring(1).split("#",2);
+		let arr = location.hash.substring(1).split(",",2);
 		if(val == -1){
 			location.hash = arr[0]; return;
 		}
-		location.hash = arr[0] + "#" + val;
+		location.hash = arr[0] + "," + val;
 	},
 	get page_content() {
-		return location.hash.substring(1).split("#",2)[0];
+		return location.hash.substring(1).split(",",2)[0];
 	},
   	set page_content(val) {
-  		let arr = location.hash.substring(1).split("#",2);
+  		let arr = location.hash.substring(1).split(",",2);
   		arr[0] = val;
-  		location.hash = arr.join("#");
+  		location.hash = arr.join(",");
   	},
 }
 
@@ -55,11 +56,17 @@ function escape_html(r){
 	d.innerText = r;
 	return d.innerHTML.replace(/<br>/g,"\n");
 }
+function remove_html(r){
+	let d = document.createElement("dir");
+	d.innerHTML = r;
+	return d.innerText;
+}
 
 async function load_user_info(){
 	let result = await user_info();
 	if(!result.error){
 		app_data.login = true;
-		app_data.username = result.firstName;
+		app_data.username = result.firstName+" "+result.lastName;
+		app_data.user_id = result.id;
 	}
 }

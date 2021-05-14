@@ -32,7 +32,7 @@
 				<markdown v-model="postContent"></markdown>
 			</div>
 			<div class='col'>
-				<div v-html="marked(escape_html(postContent))"></div>
+				<div v-html="marked(escape_html(postContent),{gfm:true})"></div>
 			</div>
 		</div>
 
@@ -56,10 +56,29 @@
 	</script>
 	@include{templates/footer.html}
 	<script>
+		"use strict";
 		let app_data2 = {};
 		app_data2.postTitle = ""; // max length = 70.
 		app_data2.postContent = "";
 		app_data2.d = app_data;
+
+		const renderer = { // bootstrap friendly table.
+			table:(header,body) => {
+				return `<table class='table table-striped'> <thead class='thead-light'>${header}</thead> ${body}</table>`;
+			},
+			code: (code, language) => {
+				const validLang = !!(language && hljs.getLanguage(language));
+
+				// Highlight only if the language is valid.
+				// highlight.js escapes HTML in the code, but we need to escape by ourselves
+				// when we don't use it.
+				const highlighted = validLang ? hljs.highlight(language, code).value : code;
+
+				// Render the highlighted code with `hljs` class.
+				return `<pre><code class="hljs ${language}">${highlighted}</code></pre>`;
+			}
+		};
+		marked.use({renderer});
 
 
 		let app2 = new Vue({
@@ -70,7 +89,7 @@
 		async function publish(){
 			let data = await create_post(app_data2.postTitle,app_data2.postContent);
 			if(!data.error){
-				location.href= "/#my";
+				app_data.page_content = "main";
 			}
 		}
 

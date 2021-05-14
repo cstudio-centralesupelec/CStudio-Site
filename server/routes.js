@@ -18,9 +18,9 @@ app.use((req,res,next) => {
 			return;
 		}
 
-		let data = "grant_type=authorization_code&code=" + code + "&redirect_uri=" + encodeURIComponent("http://localhost/q");
-		data += "&client_id=4b267ebbe01c56a9df161a48a2d1bbf2f2471fea";
-		data += "&client_secret=b1295ec7dd4b39950c5f6423c91719dfff812082";
+		let data = "grant_type=authorization_code&code=" + code + "&redirect_uri=" + encodeURIComponent("http://"+config.hostname+"/q");
+		data += "&client_id=" + config.oauth_client_id;
+		data += "&client_secret=" + config.oauth_client_secret;
 
 		const options = {
 			hostname: 'auth.viarezo.fr',
@@ -85,6 +85,19 @@ vw.endpoint("search_posts",{search:{type:"string"}},(obj,req,res) => {
 vw.endpoint("recent_posts",{page:{type:"number"}},(obj,req,res) => {
 	res.send(blog.recent_posts(5,obj.page * 5));
 },"Return a list of posts matching search");
+
+vw.endpoint("delete_post",{
+	user_id:{provider:"session",type:"number"},
+	post_id:{type:"string"}
+}, (obj,req,res) => {
+	let post = blog.get_post(obj.post_id);
+	if(post !== undefined && post.author_id === obj.user_id){
+		blog.delete_post(obj.post_id);
+		res.send({});
+	}else{
+		res.send({error:"Bad input"});
+	}
+},"Remove a post. You need to be the author of a post to remove it.");
 
 vw.endpoint("get_post",{id:{type:"string"}},(obj,req,res) => {
 

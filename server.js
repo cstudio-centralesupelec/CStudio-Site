@@ -2,9 +2,11 @@ const express = require('express')
 const session = require('express-session');
 const SQLiteStore = require('connect-sqlite3')(session);
 const Vwebsite = require('./server/vwebsite/core.js');
+const config = require('./config.js');
 
-global.vw = new Vwebsite({debug:true});
+global.vw = new Vwebsite({debug:config.debug || false});
 global.app = express();
+global.config = config;
 
 app.use(express.json());
 app.use(session({
@@ -25,4 +27,6 @@ app.use(express.static('static'));
 require('./server/routes.js'); // setup routes
 app.use(vw.api());
 
-app.listen(80);
+app.listen(config.port || 80,config.host || "0.0.0.0",() => {
+	console.log(`Website available at http://${config.hostname}:${config.port}/`)
+});

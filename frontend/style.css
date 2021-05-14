@@ -45,6 +45,10 @@ header > nav > h1{
 	padding-right:20px;
 }
 
+.grey-bg{
+	background-color:#ddd;
+}
+
 /* Computers */
 .var-size {
 	font-size: 1.25rem;
@@ -66,12 +70,15 @@ nav a{
 	text-transform: capitalize;
 	color:inherit;
 	text-decoration:none;
+	cursor:pointer;
 }
 nav a.selected{
 	color:inherit;
-	border-top:4px solid red;
+	border-top:4px solid #00a !important;
 }
 nav a:hover{
+	color:inherit;
+	text-decoration: none;
 	border-top:4px solid #a00;
 }
 textarea.markdown{
@@ -84,7 +91,22 @@ textarea.markdown{
 	margin:10px;
 	padding:10px;
 	transition:100ms;
+	width:300px;
 }
 .post_card:hover{
-	border-left:3px solid #a00;
+	border-left:6px solid #a00;
+}
+.post-holder{
+	display:flex;
+	flex-wrap:wrap;
+}
+table th,table td{
+	text-align:left !important;
+}
+pre *{
+	font-family:SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+}
+.post_content img{ /* Center images in posts */
+	display:block;
+	margin:auto;
 }

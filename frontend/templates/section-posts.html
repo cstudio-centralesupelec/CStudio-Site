@@ -1,19 +1,25 @@
-<section v-if="page_content === 'posts'" class='container'>
+<section v-if="page_content === 'posts'" class='container bg-white px-4 py-4'>
 
 	<div v-if="show_post !== -1">
-		<button class='btn btn-danger' v-on:click="show_post = -1"><i class='fa fa-times fa-fw'></i>Fermer</button>
+		<button class='btn btn-secondary' v-on:click="show_post = -1"><i class='fa fa-times fa-fw'></i>Fermer</button>
 		<h1 class='text-center'>{{ current_post.title }}</h1>
 		<div>
 			Par <em>{{ current_post.author }}</em>, le {{ current_post.date }}
 		</div>
-		<div v-html="marked(escape_html(current_post.content))"></div>
+		<div class='post_content' v-html="marked(escape_html(current_post.content),{gfm:true})"></div>
+		
+		<div class='my-3' v-if="user_id == current_post.author_id">
+			<button v-on:click="deleteCurrentPost" class='btn btn-danger'><i class='fa fa-trash fa-fw'></i>Supprimer cet article</button>
+		</div>
 	</div>
 	<div v-else>
-		<input type="text" v-on:keyup="onSearchPosts" id="search_input" placeholder="Rechercher un article"/>
-		<div v-if="loading">
+		<input class="form-control" type="text" v-on:keyup="onSearchPosts" id="search_input" placeholder="Rechercher un article"/>
+		<div class='text-center lead' v-if="loading">
 			<i class='fa fa-spinner fa-spin'></i>
 		</div>
-		<post v-else v-bind:post="post" v-for='post in posts'></post>
+		<div v-else class='post-holder'>
+			<post v-bind:post="post" v-for='post in posts'></post>
+		</div>
 	</div>
 </section>
 <script>
@@ -40,11 +46,19 @@
 			}
 		},200);
 	}
+	async function deleteCurrentPost(){
+		let result = await delete_post(app_data.show_post);
+		if(!result.error){
+			app_data.page_content = "my";
+		}else{
+			toast("Impossible de supprimer ce post");
+		}
+	}
 	async function showPost(post_id){
-		console.log("showPost.",post_id);
 		let post = await get_post(post_id);
 		app_data.page_content = "posts";
 		app_data.show_post = post_id;
+		app_data.current_post.author_id = post.author_id;
 		app_data.current_post.title = post.title;
 		app_data.current_post.content = post.content;
 		app_data.current_post.author = post.author;
@@ -57,4 +71,24 @@
 		app_data.posts = results;
 		app_data.loading = false;
 	}
+	load_posts("");
+
+	const renderer = { // bootstrap friendly table.
+		table:(header,body) => {
+			return `<table class='table table-striped'> <thead class='thead-light'>${header}</thead> ${body}</table>`;
+		},
+		code: (code, language) => {
+			const validLang = !!(language && hljs.getLanguage(language));
+
+			// Highlight only if the language is valid.
+			// highlight.js escapes HTML in the code, but we need to escape by ourselves
+			// when we don't use it.
+			const highlighted = validLang ? hljs.highlight(language, code).value : code;
+
+			// Render the highlighted code with `hljs` class.
+			return `<pre><code class="hljs ${language}">${highlighted}</code></pre>`;
+		}
+	};
+	marked.use({renderer});
+
 </script>

@@ -47,12 +47,13 @@ class Blog{
 		);`);
 	}
 	recent_posts(limit,offset){
-		let statement = this.db.prepare(`SELECT posts.id,title,name AS author,date
+		let statement = this.db.prepare(`SELECT posts.id,title,name AS author,date,SUBSTR(content,0,80) AS preview
 			FROM posts JOIN users ON users.id = posts.author ORDER BY date LIMIT ? OFFSET ?`);
 		return statement.all(limit,offset);
 	}
 	search_posts(query){
-		let statement = this.db.prepare("SELECT posts.id,title,name AS author,date FROM posts JOIN users ON users.id = posts.author WHERE title LIKE ? LIMIT 10");
+		let statement = this.db.prepare(`SELECT posts.id,title,name AS author,date,SUBSTR(content,0,80) AS preview
+			FROM posts JOIN users ON users.id = posts.author WHERE title LIKE ? ORDER BY date LIMIT 10`);
 		return statement.all("%" + query + "%");
 	}
 	create_post(title,content,author){
