@@ -50,7 +50,6 @@ if(!config.debug){
 	};
 	server = https.createServer(options,app);
 
-	console.log("r s");
 	redirection_server.listen(80, config.host || "0.0.0.0");
 
 }else{

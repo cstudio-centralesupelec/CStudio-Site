@@ -56,7 +56,6 @@ class VWebsite{
 
 						let argument_object = {};
 
-						console.log(req.session);
 						// Check if the request is valid.
 						for(let varname in curr.variables){
 							let provided = null;

@@ -117,7 +117,6 @@ vw.endpoint("create_post",{
 	post:true,
 	handler: async(obj,req,res) => {
 		let content = await getBody(req);
-		console.log(content);
 		if(content.length < 40000){
 			blog.create_post(obj.title,obj.user_id | 0,content);
 			res.send({});
