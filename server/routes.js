@@ -43,7 +43,7 @@ app.use((req,res,next) => {
 			server_res.on('end', () => {
 				let json_data = JSON.parse(response);
 
-				if(server_res.status !== 200){
+				if(server_res.status === 400){
 					console.log(json_data);
 					console.log(data);
 				}else{
