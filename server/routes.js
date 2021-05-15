@@ -43,15 +43,14 @@ app.use((req,res,next) => {
 			server_res.on('end', () => {
 				let json_data = JSON.parse(response);
 
-				console.log(json_data);
-
-				req.session.access_token = json_data.access_token;
-				req.session.refresh_token = json_data.refresh_token;
-
-				console.log(req.session);
-
+				if(server_res.status !== 200){
+					console.log(json_data);
+					console.log(data);
+				}else{
+					req.session.access_token = json_data.access_token;
+					req.session.refresh_token = json_data.refresh_token;
+				}
 				res.redirect('/');
-
 			});
 		});
 
