@@ -27,7 +27,7 @@
 			<div v-else class='my-2'>
 				Aucun fichier associé à cet post
 			</div>
-			<div class='w-100 row'>
+			<div v-if="user_id == current_post.author_id" class='w-100 row'>
 				<div class="custom-file w-50 mx-2">
 					<input multiple type='file' v-on:change="updateInputField" id="fileInput" class='custom-file-input'/>
 					<label class="custom-file-label">Uploader un fichier</label>
