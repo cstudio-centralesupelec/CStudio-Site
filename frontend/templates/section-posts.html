@@ -11,22 +11,26 @@
 		<div class='mx-2 my-2 text-center' v-if="current_post.files.indexOf('main.js') != -1">
 			<a class='lead' v-bind:href="`/game.html?id=${show_post}`">Jouer au jeu associé à cet article</a>
 		</div>
+		<hr/>
 
 		<div class='mx-2 my-2'>
-			<div>Fichiers associés à ce post</div>
-			<div v-if="current_post.files.length > 0" class='my-2' v-for="file in current_post.files">
-				<a v-bind:href="`q/get_post_file?post_id=${show_post}&file=${file}`">
-					{{ file }}
-				</a>
-				<span class='px-1' v-if="user_id == current_post.author_id">
-					<button class='btn btn-warning btn-sm' v-bind:data-filename="file" v-on:click="removeFileFromPost">
-						<i class='fa fa-trash fa-fw'></i> Supprimer ce fichier
-					</button>
-				</span>
+			<div v-if="current_post.files.length > 0">
+				<div>Fichiers associés à cet article</div>
+				<div class='my-2' v-for="file in current_post.files">
+					<a v-bind:href="`q/get_post_file?post_id=${show_post}&file=${file}`">
+						{{ file }}
+					</a>
+					<span class='px-1' v-if="user_id == current_post.author_id">
+						<button class='btn btn-warning btn-sm' v-bind:data-filename="file" v-on:click="removeFileFromPost">
+							<i class='fa fa-trash fa-fw'></i> Supprimer ce fichier
+						</button>
+					</span>
+				</div>
 			</div>
-			<div v-else class='my-2'>
-				Aucun fichier associé à cet post
+			<div v-if="current_post.files.length == 0" class='my-2'>
+				Aucun fichier associé à cet article
 			</div>
+
 			<div v-if="user_id == current_post.author_id" class='w-100 row'>
 				<div class="custom-file w-50 mx-2">
 					<input multiple type='file' v-on:change="updateInputField" id="fileInput" class='custom-file-input'/>
