@@ -8,8 +8,7 @@
 		<div class="collapse navbar-collapse" id="navbarid">
 			<div class='navbar-nav align-items-center'>
 				<div class='nav-item'><a v-bind:class="page_content == 'main' ? 'selected': ''" v-on:click="page_content = 'main'">accueil</a></div>
-				<div class='nav-item'><a v-bind:class="page_content == 'posts' ? 'selected': ''" v-on:click="page_content = 'posts'">articles</a></div>
-				<div class='nav-item'><a v-bind:class="page_content == 'games' ? 'selected': ''" v-on:click="page_content = 'games'">jeux</a></div>
+				<div class='nav-item'><a v-bind:class="page_content == 'posts' ? 'selected': ''" v-on:click="page_content = 'posts'">rechercher</a></div>
 				<div class='nav-item'><a v-bind:class="page_content == 'about' ? 'selected': ''" v-on:click="page_content = 'about'">à propos</a></div>
 				<div v-if="!login" class='nav-item'><button class='btn btn-primary' onclick="login();">Connexion via VR</button></div>
 				

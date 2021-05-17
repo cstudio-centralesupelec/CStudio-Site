@@ -8,6 +8,36 @@
 		</div>
 		<div class='post_content' v-html="marked(escape_html(current_post.content),{gfm:true})"></div>
 		
+		<div class='mx-2 my-2 text-center' v-if="current_post.files.indexOf('main.js') != -1">
+			<a class='lead' v-bind:href="`/game.html?id=${show_post}`">Jouer au jeu associé à cet article</a>
+		</div>
+
+		<div class='mx-2 my-2'>
+			<div>Fichiers associés à ce post</div>
+			<div v-if="current_post.files.length > 0" class='my-2' v-for="file in current_post.files">
+				<a v-bind:href="`q/get_post_file?post_id=${show_post}&file=${file}`">
+					{{ file }}
+				</a>
+				<span class='px-1' v-if="user_id == current_post.author_id">
+					<button class='btn btn-warning btn-sm' v-bind:data-filename="file" v-on:click="removeFileFromPost">
+						<i class='fa fa-trash fa-fw'></i> Supprimer ce fichier
+					</button>
+				</span>
+			</div>
+			<div v-else class='my-2'>
+				Aucun fichier associé à cet post
+			</div>
+			<div class='w-100 row'>
+				<div class="custom-file w-50 mx-2">
+					<input multiple type='file' v-on:change="updateInputField" id="fileInput" class='custom-file-input'/>
+					<label class="custom-file-label">Uploader un fichier</label>
+				</div>
+				<button v-on:click="addFilesToPost" class='btn btn-primary'>
+					<i class='fa fa-plus'></i> Ajouter un fichier
+				</button>
+			</div>
+		</div>
+
 		<div class='my-3' v-if="user_id == current_post.author_id">
 			<button v-on:click="deleteCurrentPost" class='btn btn-danger'><i class='fa fa-trash fa-fw'></i>Supprimer cet article</button>
 		</div>
@@ -25,9 +55,7 @@
 <script>
 	"use strict";
 	window['app_data'] = window['app_data'] || {};
-	app_data.posts = [
-		
-	];
+	app_data.posts = [];
 	app_data.loading = false;
 	app_data.show_post = -1;
 	app_data.current_post = {
@@ -35,6 +63,7 @@
 		content:"",
 		date:"",
 		author:"",
+		files:[]
 	};
 
 	function onSearchPosts(){
@@ -46,16 +75,58 @@
 			}
 		},200);
 	}
+	function updateInputField(e){
+		let fileInput = e.target;
+		let s = [];
+		for(let i = 0;i < fileInput.files.length;i++){
+			s.push(fileInput.files[i].name);
+		} 
+		fileInput.nextElementSibling.innerHTML = s.join(',');		
+	}
+	async function addFilesToPost(){
+		for(let i = 0;i < fileInput.files.length;i++){
+			await upload_post_file(app_data.show_post,fileInput.files[i].name,fileInput.files[i]);
+		}
+		fileInput.value = ""; // reset field.
+		
+		let files = await list_post_file(app_data.show_post);
+		if(!files.error){
+			console.log(files);
+			app_data.current_post.files = files;
+		}
+	}
+
 	async function deleteCurrentPost(){
 		let result = await delete_post(app_data.show_post);
 		if(!result.error){
+			// update post list
+			load_posts("");
 			app_data.page_content = "my";
 		}else{
 			toast("Impossible de supprimer ce post");
 		}
 	}
+	async function removeFileFromPost(e){
+		let filename = e.srcElement.getAttribute('data-filename');
+		let res = await remove_post_file(app_data.show_post,filename);
+
+		// reload post files:
+		if(res.error){
+			toast("Impossible de supprimer ce fichier.");
+		}
+		let files = await list_post_file(app_data.show_post);
+		if(!files.error){
+			console.log(files);
+			app_data.current_post.files = files;
+		}
+	}
 	async function showPost(post_id){
 		let post = await get_post(post_id);
+		if(typeof post.title === "undefined"){
+			// invalid post.
+			app_data.show_post = -1;
+			return;
+		}
 		app_data.page_content = "posts";
 		app_data.show_post = post_id;
 		app_data.current_post.author_id = post.author_id;
@@ -63,6 +134,12 @@
 		app_data.current_post.content = post.content;
 		app_data.current_post.author = post.author;
 		app_data.current_post.date = new Intl.DateTimeFormat(['ban','fr']).format(new Date(post.date));
+
+		// retreive files associated to the current post:
+		let files = await list_post_file(post_id);
+		if(!files.error){
+			app_data.current_post.files = files;
+		}
 	}
 
 	async function load_posts(query){

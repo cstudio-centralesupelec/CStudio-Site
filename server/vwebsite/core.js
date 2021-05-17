@@ -21,7 +21,7 @@ class VWebsite{
 		// setup defaults
 		this.debug = config.debug || false;
 		this.routes = {};
-		this.url = config.url || "/q";
+		this.url = config.url || "q";
 		this.client_script = config.client_script || "/client.js";
 
 
@@ -48,10 +48,13 @@ class VWebsite{
 				res.end();
 				return;
 			}
+			let parts = query_path.substring(1).split("/",2);			
 
-			if(query_path === this.url){ // provide the endpoints
+			if(parts.length == 2 && parts[0] === this.url){ // provide the endpoints
+				let type = parts[1];
+
 				for(let endpointName in this.routes){
-					if(endpointName === get_arguments.type){
+					if(endpointName === type){
 						let curr = this.routes[endpointName];
 
 						let argument_object = {};
@@ -167,11 +170,14 @@ class VWebsite{
 				ep_arguments.push('post_data');
 			}
 
-			let exampleUrl = `${this.url}?type=${endpoint_name}`;
+			let exampleUrl = `${this.url}/${endpoint_name}`;
+			let isFirst = true;
 
 			for(let arg in endpoint.variables){
 				if(endpoint.variables[arg].provider !== 'session'){
-					exampleUrl += `&${arg}=${arg}`;
+					exampleUrl += isFirst ? "?" : "&"
+					exampleUrl += `${arg}=${arg}`;
+					isFirst = false;
 				}
 			}
 
@@ -232,11 +238,14 @@ let data = await ${endpoint_name}(${ep_arguments.join(',')});
 
 			let current_js_function = "async function "+endpoint_name+"(" + ep_arguments.join(',') + "){\n";
 
-			current_js_function += "	let result = await get_website('"+this.url+"?type="+endpoint_name;
+			current_js_function += `	let result = await get_website('${this.url}/${endpoint_name}`;
 
+			isFirst = true;
 			for(let arg in endpoint.variables){
 				if(endpoint.variables[arg].provider !== 'session'){
-					current_js_function += "&" + arg + "=" + "'+"+arg+"+'";
+					current_js_function += isFirst ? "?" : "&"
+					current_js_function += `${arg}='+${arg}+'`;
+					isFirst = false;
 				}
 			}
 

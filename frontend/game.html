@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<!-- This file is part of the vanyle developpement kit. -->
+	<title>CStudio</title>
+	<script src="client.js"></script>
+	<script src="vdk.js"></script>
+</head>
+<body>
+</body>
+<script>
+	let url = new URL(location.href);
+	let game_id = url.searchParams.get("id");
+	if(game_id == null){
+		location.href = "/";
+	}
+	console.log(game_id); 
+
+	async function loadGame(game_id){
+		let script = document.createElement('script');
+		script.src = `/q/get_post_file/?post_id=${game_id}&file=main.js`;
+		document.body.appendChild(script);
+		document.body.removeChild(script);
+	}
+	loadGame(game_id);
+
+</script>
+</html>

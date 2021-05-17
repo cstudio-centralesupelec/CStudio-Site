@@ -8,7 +8,10 @@
 	<div id="app2" class='w-80 px-5'>
 		<div class='row'>
 			<div class='col'>
-				
+				<div class='form-group row px-5'>
+					<input type="checkbox" v-model="isGame" class="form-check-input">
+					<label class="form-check-label" for="exampleCheck1">Vous créez un {{ isGame ? "jeu" : "article"}}</label>
+				</div>
 			</div>
 			<div class='col'>
 				<h2>Aperçu</h2>
@@ -17,7 +20,8 @@
 		
 		<div class='row'>
 			<div class='col'>
-				<input type="text" class="" v-model="postTitle" placeholder="Titre de l'article"/> <br/>
+				<input required type="text" class='post_title_input w-100 text-center' class="" v-model="postTitle" 
+					v-bind:placeholder="'Titre '+(isGame ? 'du jeu' : 'de l\'article')"/>
 			</div>
 			<div class='col'>
 				<h1 class='text-center'> {{ postTitle || "Titre" }}</h1>
@@ -29,7 +33,7 @@
 
 		<div class='row'>
 			<div class='col'>
-				<markdown v-model="postContent"></markdown>
+				<markdown class='w-100' v-bind:isGame="isGame" v-model="postContent"></markdown>
 			</div>
 			<div class='col'>
 				<div v-html="marked(escape_html(postContent),{gfm:true})"></div>
@@ -38,11 +42,16 @@
 
 		<div class='row'>
 			<div class='col'>
-				<button class='btn btn-primary' onClick="publish();">Publier</button>
+				<div class="custom-file">
+					<input multiple id="fileInput" class='custom-file-input' type="file"/>
+					<label class="custom-file-label">Uploader des fichiers associés à {{ isGame ? "ce jeu" : "cet article"}}</label>
+				</div>
 			</div>
-			<div>
-
-			</div>
+			<div class='col'></div>
+		</div>
+		<br/>
+		<div class='row'>
+			<button class='btn btn-primary' onClick="publish();">Publier</button>
 		</div>
 	</div>
 	<script>
@@ -57,7 +66,9 @@
 	@include{templates/footer.html}
 	<script>
 		"use strict";
+
 		let app_data2 = {};
+		app_data2.isGame = false;
 		app_data2.postTitle = ""; // max length = 70.
 		app_data2.postContent = "";
 		app_data2.d = app_data;
@@ -76,6 +87,9 @@
 
 				// Render the highlighted code with `hljs` class.
 				return `<pre><code class="hljs ${language}">${highlighted}</code></pre>`;
+			},
+			image: (href,title,text) => {
+				return `<img src="${href}" title="${title}"/>`;
 			}
 		};
 		marked.use({renderer});
@@ -86,11 +100,30 @@
 			data: app_data2,
 		});
 
+		fileInput.addEventListener('change',(e) => {
+			let s = [];
+			for(let i = 0;i < fileInput.files.length;i++){
+				s.push(fileInput.files[i].name);
+			} 
+			fileInput.nextElementSibling.innerHTML = s.join(',');
+			
+		});
+
 		async function publish(){
 			let data = await create_post(app_data2.postTitle,app_data2.postContent);
-			if(!data.error){
-				app_data.page_content = "main";
+			if(data.error){
+				toast("Impossible de créer l'article");
+				return;
 			}
+			let new_post_id = data.id;
+			console.log(data);
+			// now if game, add metadata isGame
+			// also upload the files.
+			for(let i = 0;i < fileInput.files.length;i++){
+				await upload_post_file(new_post_id,fileInput.files[i].name,fileInput.files[i]);
+			}
+
+			app_data.page_content = "main";
 		}
 
 	</script>

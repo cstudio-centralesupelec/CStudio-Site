@@ -1,11 +1,8 @@
 <section v-if="page_content === 'main'" class='container'>
 	<div class="b-example-divider"></div>
-	<article class='px-4 py-5 my-5 text-center bg-white'>
-		<h2>Jeux récents</h2>
-	</article>
 	<div class="b-example-divider"></div>
 	<article class='px-4 py-5 my-5 text-center bg-white'>
-		<h2>Articles récents</h2>
+		<h2>Articles et jeux récents</h2>
 
 		<div class='post-holder'>
 			<post v-bind:post="post" v-for='post in recent_posts'></post>

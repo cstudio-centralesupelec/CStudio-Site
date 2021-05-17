@@ -63,6 +63,7 @@ recursivelyExplore("./frontend",(spath,rawpath) => {
 		let result = process_file_content(content,spath);
 
 		fs.writeFileSync("./static/" + rawpath,result,{encoding:'utf8'});
+		
 		return;
 	}
 

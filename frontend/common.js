@@ -46,7 +46,7 @@ if(app.show_post != -1){
 }
 
 function login(){
-	let redirect_url = encodeURIComponent(`${location.origin}/q`);
+	let redirect_url = encodeURIComponent(`${location.origin}/q/oauth`);
 	let url = `https://auth.viarezo.fr/oauth/authorize?redirect_uri=${redirect_url}&client_id=4b267ebbe01c56a9df161a48a2d1bbf2f2471fea&response_type=code&state=truc&scope=default`;
 	location.href = url;
 }

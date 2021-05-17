@@ -25,8 +25,6 @@ app.use(session({
 	cookie: { path:'/', maxAge: 7 * 24 * 60 * 60 * 1000 } // 1 week
 }));
 
-
-
 app.use(express.static('static'));
 require('./server/routes.js'); // setup routes
 app.use(vw.api());
@@ -58,5 +56,5 @@ if(!config.debug){
 }
 
 server.listen(config.port || port_default,config.host || "0.0.0.0",() => {
-	console.log(`Website available at http://${config.hostname}:${config.port}/`)
+	console.log(`Website available at ${config.hostname}:${config.port}/`)
 });
