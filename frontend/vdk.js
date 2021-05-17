@@ -85,6 +85,22 @@
 			(window.mouseMoved || function(){})();
 		}
 	});
+	addEventListener('touchstart',function(e){
+		isMousePressed = true;
+		if(canvas != undefined){
+			mousex = (e.touches[0].clientX - canvas.offsetLeft) * canvas.width / canvas.offsetWidth;
+			mousey = (e.touches[0].clientY - canvas.offsetTop) * canvas.height / canvas.offsetHeight;
+		}
+		(window.mousePressed || function(){})();
+	});
+	addEventListener('touchmove',function(e){
+		isMousePressed = true;
+		if(canvas != undefined){
+			mousex = (e.touches[0].clientX - canvas.offsetLeft) * canvas.width / canvas.offsetWidth;
+			mousey = (e.touches[0].clientY - canvas.offsetTop) * canvas.height / canvas.offsetHeight;
+		}
+		(window.mouseMoved || function(){})();
+	});
 	addEventListener('mousewheel',function(e){
 		(window.wheel || function(){})(e.wheelDelta);
 	});
@@ -93,6 +109,10 @@
 		(window.mousePressed || function(){})();
 	});
 	addEventListener('mouseup',function(e){
+		isMousePressed = false;
+		(window.mouseUnPressed || function(){})();
+	});
+	addEventListener('touchend',function(e){
 		isMousePressed = false;
 		(window.mouseUnPressed || function(){})();
 	});
@@ -382,6 +402,10 @@
 
 	window.text = function(txt,x,y){
 		ctx.fillText(txt, x, y);
+	}
+	window.font = function(size,name){
+		name = name || "Helvetica";
+		ctx.font = size + 'px '+name;
 	}
 	window.image = function(img,x,y,w,h,sx,sy,sw,sh){
 		if(sx === undefined){
