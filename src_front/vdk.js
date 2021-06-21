@@ -6,21 +6,22 @@
 */
 
 (function(){
-	let canvas,html,body,ctx,seed1,fulls = false;
+	let canvas,html,body,seed1,fulls = false;
 	window.mousex = 0;
 	window.mousey = 0;
 	window.pressedKeys = {};
 	window.fov = 100;
 	window.isMousePressed = false;
 	let user_id = -1;
+	window.ctx = null; // ctx is public, so that you are not limited by the built-in functions.
 
 	// Setup
 
-	function setup(){
+	async function setup(){
 		fullscreen();
 		seedRandom(Math.random());
 
-		fetchUserId();
+		await fetchUserId();
 
 		document.querySelector('canvas').addEventListener('click', () => {
 			if(!audioStarted){
