@@ -12,15 +12,38 @@
 	window.pressedKeys = {};
 	window.fov = 100;
 	window.isMousePressed = false;
+	let user_id = -1;
 
 	// Setup
 
 	function setup(){
 		fullscreen();
 		seedRandom(Math.random());
+
+		fetchUserId();
+
+		document.querySelector('canvas').addEventListener('click', () => {
+			if(!audioStarted){
+				setupAudio()
+				audioStarted = true;
+			}
+		},true);
+
 		(window.main || function(){})();
 		drawLoop();
 	}
+
+	async function fetchUserId(){
+		// On récupère l'id de l'utilisateur
+		try{
+			user_id = (await user_info()).id;
+			let specific_s = await list_specific_score(user_id,game_id);
+			if(specific_s.length == 1){
+				score = specific_s[0].value;
+			}
+		}catch(err){}
+		
+	} 
 
 	/*window.setCanvas = function(id,w,h){
 		fulls = false;
@@ -48,7 +71,29 @@
 		ctx = canvas.getContext('2d');
 	}
 
+	let score = 0;
+	window.setscore = async function(s){
+		if(s <= score) return; // score should only increase. 
+		score = s;
+		try{
+			await create_score(game_id,s);
+		}catch(err){
+			// score already exists.
+			if(user_id !== -1){
+				let specific_s = await list_specific_score(user_id,game_id);
+				if(specific_s.length == 1){
+					specific_s = specific_s[0].id;
+					set_score_value(s,specific_s);
+				}
+			}		
+		}
+	}
+	window.getscore = function(){
+		return score;
+	}
+
 	let isRenderError = false;
+
 
 	function drawLoop(){
 		if(!isRenderError){
@@ -432,31 +477,47 @@
 
 	// Audio features
 
-	class AudioStream{
-		constructor(src){
-			this.audio = new Audio();
-			try{
-				// attempt to load from predefined
-				this.audio.src = "/assets/game/"+src;
-			}catch(err){
-				// loading any url instead.
-				this.audio.src = src;
-			}
-		}
-		play(){
-			this.audio.play();
-		}
-		pause(){
-			this.audio.pause();
-		}
-		loop(){
-			this.audio.loop();
-		}
+	let audio_context = null;
+	let osc = null;
+	let gain = null;
+	let audioStarted = false;
+
+	// this can only be called after the user has interacted with the page (click, etc...)
+	function setupAudio(){
+		audio_context = new AudioContext();
+		osc = audio_context.createOscillator();
+		gain = audio_context.createGain();
+
+		gain.gain.value = 0;
+		osc.frequency.value = 440;
+		osc.connect(gain);
+		gain.connect(audio_context.destination);
+		osc.start();
+		audioStarted = true;
+	}
+	window.sound = function(freq,volume,fadeout){
+		if(!audioStarted) return;
+		volume = volume || .3;
+		osc.frequency.value = freq || 440;
+		fadeout = fadeout || .9;
+
+		setTimeout(() => {
+			gain.gain.value = volume;
+			let i = setInterval(() => {
+				gain.gain.value = gain.gain.value * fadeout;
+				if(gain.gain.value < 0.01){
+					gain.gain.value = 0;
+					clearInterval(i);
+				}
+			},5);
+		},50);
 	}
 
-	window.createAudio = function(src){
-
-		return new AudioSteam(src);
-	}
+	addEventListener('mousedown', () => {
+		if(!audioStarted){
+			setupAudio();
+			audioStarted = true;
+		}
+	});
 
 })();
