@@ -1,14 +1,33 @@
 const express = require('express')
 const session = require('express-session');
 const SQLiteStore = require('connect-sqlite3')(session);
-const Vwebsite = require('./server/vwebsite/core.js');
+const VBel = require('./src_back/vbel2/index.js');
+const sqlite3 = require('better-sqlite3');
 const config = require('./config.js');
 
 const https = require('https');
 const http = require('http');
 const fs = require('fs');
 
-global.vw = new Vwebsite({debug:config.debug || false});
+let db = sqlite3("./db/cstudio.db",{});
+
+let vconfig = {
+	sql:{
+		_run: (statement,...args) => {
+			let s = db.prepare(statement);
+			//console.log("RUN: ",statement,args);
+			return s.run.apply(s,args);
+		},
+		_get_all:(statement, ...args) => {
+			let s = db.prepare(statement);
+			//console.log("GETALL: ",statement,args);
+			return s.all.apply(s,args);
+		},
+	},
+	doc: config.debug || false
+}
+
+global.vw = new VBel(vconfig);
 global.app = express();
 global.config = config;
 
@@ -26,8 +45,8 @@ app.use(session({
 }));
 
 app.use(express.static('static'));
-require('./server/routes.js'); // setup routes
-app.use(vw.api());
+require('./src_back/scheme.js'); // setup routes
+app.use(vw);
 
 let server = null;
 let port_default = 80;
@@ -54,6 +73,8 @@ if(!config.debug){
 	// http debug server.
 	server = http.createServer(app);
 }
+
+vw.enableWebsockets(server);
 
 server.listen(config.port || port_default,config.host || "0.0.0.0",() => {
 	console.log(`Website available at ${config.hostname}:${config.port}/`)

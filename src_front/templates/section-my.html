@@ -1,0 +1,98 @@
+<section v-if="page_content === 'my'">
+	<div class='px-5'>
+		<div class='w-80 px-5 py-2 my-2'>
+			<button onClick="logof(); location.reload();" class='btn btn-primary'>
+				Déconnexion
+			</button>
+		</div>
+
+		<div class='w-80 px-5 py-2 my-4 bg-white'>
+			<h2 class='my-2'>Mes scores</h2>
+			<div class='trophy-holder'>
+				<div v-if="scores.length != 0">
+					<table class="table">
+						<thead>
+						<tr>
+							<th scope="col">Jeu</th>
+							<th scope="col">Score</th>
+						</tr>
+						</thead>
+						<tbody>
+							<tr v-for="score in scores">
+								<th scope="row"><a v-on:click='showPost(score.game_id)'>{{score.game}}</a></th>
+								<th>{{score.value}} points</th>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<div v-else>
+					Vous n'avez pas encore de scores. Jouez à des jeux pour en avoir !
+				</div>
+			</div>
+		</div>
+
+		<div v-if="app_data.rank >= 2" class='w-80 bg-white px-5 py-2 my-4'>
+			<h2 class='my-2'>Mes articles et jeux</h2>
+			<a class='btn btn-primary' href="/new_post.html"><i class='fa fa-fw fa-plus'></i>Nouvel article ou jeu</a>
+
+			<div class='post-holder'>
+				<post v-bind:key="post.id" v-bind:post="post" v-for='post in my_posts'></post>
+				<div v-if="my_posts.length == 0">
+					Vous n'avez publié aucun article.
+				</div>
+			</div>
+		</div>
+
+		<div v-if="app_data.rank >= 4" class='w-80 bg-white px-5 py-2 my-4'>
+			<h2 class='my-2'>Administration</h2>
+			<input class="form-control" type="text" v-on:keyup="onSearchUsers" id="search_input2" placeholder="Rechercher un utilisateur"/>
+			<div class='text-center lead' v-if="loading">
+				<i class='fa fa-spinner fa-spin'></i>
+			</div>
+			<div v-else class='user-holder'>
+				<user-display v-bind:key="user.id" v-bind:user="user" v-for="user in user_list"></user-display>
+				<div v-if="user_list.length == 0">
+					Aucun utilisateur trouvé.
+				</div>
+			</div>
+		</div>
+	</div>
+</section>
+<script>
+	window['app_data'] = window['app_data'] || {};
+	app_data.my_posts = [];
+	app_data.user_list = [];
+	app_data.loading = false;
+	app_data.scores = [];
+
+	addEventListener('user_ready', async () => {
+		if(app_data.rank === undefined){
+			app_data.page_content = 'main';
+		}
+		let my_posts = await get_user_posts(app_data.user_id);
+		app_data.my_posts = my_posts;
+
+		if(app_data.rank >= 4){
+			let user_list = await list_user("");
+			app_data.user_list = user_list;
+		}
+
+		let my_scores = await list_by_user_score(app_data.user_id);
+		app_data.scores = my_scores;
+
+	});
+
+	function onSearchUsers(){
+		let v = search_input2.value;
+		app_data.loading = true;
+		setTimeout(async () => {
+			if(v == search_input2.value){
+				console.log(v);
+				let user_list = await list_user(v);
+				app_data.user_list = user_list;
+				app_data.loading = false;
+			}
+		},200);
+	}
+
+</script>

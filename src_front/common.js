@@ -9,6 +9,8 @@ location.hash = location.hash || "main";
 app_data.login = false;
 app_data.username = "";
 app_data.user_id = -1;
+app_data.rank = -1;
+
 app_data = {
 	...app_data,
 	get show_post(){
@@ -27,27 +29,20 @@ app_data = {
 		return location.hash.substring(1).split(",",2)[0];
 	},
   	set page_content(val) {
-  		let arr = location.hash.substring(1).split(",",2);
-  		arr[0] = val;
-  		location.hash = arr.join(",");
+  		//show_post = -1; // reset show post
+  		//let arr = location.hash.substring(1).split(",",2);
+  		//arr[0] = val;
+  		//location.hash = arr.join(",");
+  		location.hash = val;
   	},
 }
 
 load_user_info();
 
-
-let app = new Vue({
-	el: '#app',
-	data: app_data
-});
-
-if(app.show_post != -1){
-	showPost(app.show_post);
-}
-
 function login(){
 	let redirect_url = encodeURIComponent(`${location.origin}/q/oauth`);
-	let url = `https://auth.viarezo.fr/oauth/authorize?redirect_uri=${redirect_url}&client_id=4b267ebbe01c56a9df161a48a2d1bbf2f2471fea&response_type=code&state=truc&scope=default`;
+	let url = `https://auth.viarezo.fr/oauth/authorize?redirect_uri=${redirect_url}`
+	url += `&client_id=4b267ebbe01c56a9df161a48a2d1bbf2f2471fea&response_type=code&state=truc&scope=default linkcs-asso:read`;
 	location.href = url;
 }
 
@@ -63,10 +58,23 @@ function remove_html(r){
 }
 
 async function load_user_info(){
-	let result = await user_info();
-	if(!result.error){
+	try{
+		let result = await user_info();
 		app_data.login = true;
-		app_data.username = result.firstName+" "+result.lastName;
+		app_data.username = result.name;
+		app_data.rank = result.rank;
 		app_data.user_id = result.id;
-	}
+	}catch(err){}
+	let event = new CustomEvent("user_ready", {});
+	dispatchEvent(event);
+}
+
+
+let app = new Vue({
+	el: '#app',
+	data: app_data
+});
+
+if(app_data.show_post != -1){
+	showPost(app_data.show_post);
 }

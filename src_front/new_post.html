@@ -9,8 +9,8 @@
 		<div class='row'>
 			<div class='col'>
 				<div class='form-group row px-5'>
-					<input type="checkbox" v-model="isGame" class="form-check-input">
-					<label class="form-check-label" for="exampleCheck1">Vous créez un {{ isGame ? "jeu" : "article"}}</label>
+					<input type="checkbox" v-model="isPrivate" class="form-check-input">
+					<label class="form-check-label" for="exampleCheck1">Cet article sera {{ isPrivate ? "privé (uniquement visible par les membres de l'association)" : "public"}}</label>
 				</div>
 			</div>
 			<div class='col'>
@@ -21,7 +21,7 @@
 		<div class='row'>
 			<div class='col'>
 				<input required type="text" class='post_title_input w-100 text-center' class="" v-model="postTitle" 
-					v-bind:placeholder="'Titre '+(isGame ? 'du jeu' : 'de l\'article')"/>
+					placeholder="Titre de l'article"/>
 			</div>
 			<div class='col'>
 				<h1 class='text-center'> {{ postTitle || "Titre" }}</h1>
@@ -33,7 +33,7 @@
 
 		<div class='row'>
 			<div class='col'>
-				<markdown class='w-100' v-bind:isGame="isGame" v-model="postContent"></markdown>
+				<markdown class='w-100' v-model="postContent"></markdown>
 			</div>
 			<div class='col'>
 				<div v-html="marked(escape_html(postContent),{gfm:true})"></div>
@@ -44,7 +44,7 @@
 			<div class='col'>
 				<div class="custom-file">
 					<input multiple id="fileInput" class='custom-file-input' type="file"/>
-					<label class="custom-file-label">Uploader des fichiers associés à {{ isGame ? "ce jeu" : "cet article"}}</label>
+					<label class="custom-file-label">Uploader des fichiers associés à cet article</label>
 				</div>
 			</div>
 			<div class='col'></div>
@@ -68,7 +68,7 @@
 		"use strict";
 
 		let app_data2 = {};
-		app_data2.isGame = false;
+		app_data2.isPrivate = false;
 		app_data2.postTitle = ""; // max length = 70.
 		app_data2.postContent = "";
 		app_data2.d = app_data;
@@ -110,13 +110,12 @@
 		});
 
 		async function publish(){
-			let data = await create_post(app_data2.postTitle,app_data2.postContent);
-			if(data.error){
+			let new_post_id = await create_post(app_data2.isPrivate ? 1 : 0,app_data2.postTitle,encodeURIComponent(app_data2.postContent));
+			if(new_post_id.error){
 				toast("Impossible de créer l'article");
 				return;
 			}
-			let new_post_id = data.id;
-			console.log(data);
+			console.log(new_post_id);
 			// now if game, add metadata isGame
 			// also upload the files.
 			for(let i = 0;i < fileInput.files.length;i++){

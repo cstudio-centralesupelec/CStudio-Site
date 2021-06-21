@@ -50,7 +50,7 @@ function recursivelyExplore(dirname,apply,raw_path){
 	}
 }
 
-recursivelyExplore("./frontend",(spath,rawpath) => {
+recursivelyExplore("./src_front",(spath,rawpath) => {
 	if(spath.indexOf("template") !== -1){
 		return;
 	}

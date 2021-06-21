@@ -1,11 +1,12 @@
 <section v-if="page_content === 'main'" class='container'>
-	<div class="b-example-divider"></div>
-	<div class="b-example-divider"></div>
-	<article class='px-4 py-5 my-5 text-center bg-white'>
+	<article class='px-4 py-4 text-center bg-white'>
 		<h2>Articles et jeux récents</h2>
 
 		<div class='post-holder'>
 			<post v-bind:post="post" v-for='post in recent_posts'></post>
+			<div v-if="recent_posts.length == 0">
+					Aucun article trouvé
+			</div>
 		</div>
 
 	</article>
@@ -16,8 +17,15 @@
 	app_data.recent_posts = [];
 
 	async function loadRecentPosts(storage){
-		let posts = await recent_posts(0);
-		app_data[storage] = posts;
+		let result = [];
+		if(app_data.rank >= 1){
+			result = await list_by_date2_post();
+		}else{
+			result = await list_by_date_post();
+		}
+		app_data.recent_posts = result;
 	}
-	loadRecentPosts("recent_posts");
+	addEventListener('user_ready', () => {
+		loadRecentPosts();
+	});
 </script>

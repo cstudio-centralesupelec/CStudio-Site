@@ -9,6 +9,13 @@ body,html{
 	padding:0;
 	overflow: auto;
 }
+body{
+	background-color: #eaeaea;
+}
+h1,h2,h3,h4,h5,h6{
+	margin-bottom: 0;
+	margin-top: 0;
+}
 header{
 	display:flex;
 	justify-content:center;
@@ -31,7 +38,7 @@ ul{
 	list-style-position: inside;
 }
 h1{
-	padding-top:5px;
+	padding-bottom:10px;
 }
 nav{
 	display:flex;
@@ -56,9 +63,16 @@ header > nav > h1{
 
 /* Phones and tablets */
 @media (max-width: 768px) {
-  .var-size {
-    font-size: 1rem;
-  }
+	.var-size {
+		font-size: 1rem;
+	}
+}
+
+a{
+	cursor: pointer;
+}
+table a:hover{
+	color: blue;
 }
 
 nav a{
@@ -88,14 +102,11 @@ textarea.markdown{
 	font-family:SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
 	tab-size : 4;
 }
-.post_card,.game_card{
+.post_card{
 	margin:10px;
 	padding:10px;
 	transition:100ms;
 	width:300px;
-}
-.game_card{
-	border-left:6px solid #fd0;
 }
 .post_card{
 	border-left:6px solid #6af;
@@ -103,15 +114,15 @@ textarea.markdown{
 .post_card:hover{
 	border-left:10px solid #6af;
 }
-.game_card:hover{
-	border-left:10px solid #fd0;
-}
-.post-holder{
+.post-holder,.user-holder{
 	display:flex;
 	flex-wrap:wrap;
 }
 table th,table td{
 	text-align:left !important;
+}
+tbody th{
+	font-weight: normal;
 }
 pre *{
 	font-family:SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
