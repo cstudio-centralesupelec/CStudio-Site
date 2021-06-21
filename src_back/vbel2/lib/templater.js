@@ -27,8 +27,7 @@ This: @include{../thing.txt} is not possible
 const fs = require('fs');
 const path = require('path');
 
-const moduleURL = new URL(__filename); // retreive path to current file
-let dirname = path.dirname(moduleURL.pathname);
+let dirname = path.dirname(__filename);
 if(dirname.indexOf(':/') !== -1){
 	dirname = dirname.substring(1);
 }

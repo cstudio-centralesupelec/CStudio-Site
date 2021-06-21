@@ -2,8 +2,7 @@ const fs = require('fs');
 const path = require('path');
 const templater = require('./templater.js');
 
-const moduleURL = new URL(__filename); // retreive path to current file
-let dirname = path.dirname(moduleURL.pathname);
+let dirname = path.dirname(__filename);
 if(dirname.indexOf(':/') !== -1){
 	dirname = dirname.substring(1);
 }
