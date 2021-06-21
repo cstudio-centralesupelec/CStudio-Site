@@ -19,7 +19,7 @@ Dans le repo, modifier le fichier `config.js` pour correspondre à la situation.
 Puis, mettre les certificats `https` du site dans le dossier `cert` sous le nom `privkey.pem `et `cert.pem`.
 
 Voici un exemple de configuration pour faire tourner le site localement:
-````js
+```js
 module.exports = {
 	oauth_client_id: "...",
 	oauth_client_secret: "...",
