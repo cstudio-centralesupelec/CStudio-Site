@@ -26,9 +26,11 @@ const RANKS = {
 // Functions used for permissions
 
 function isMemberOrNotPrivate(userid,targetObj){
+	if(targetObj === undefined) return false;
 	return targetObj.isprivate == 0 || vw.getDatabaseValue("user",userid,"rank")[0].rank >= RANKS.MEMBER;
 }
 function isAuthor(userid,postObj){
+	if(postObj === undefined) return false;
 	return userid === postObj.author_id;
 }
 function isAdmin(userid,userObj){
@@ -38,6 +40,7 @@ function isAdmin(userid,userObj){
 }
 function isAllowedToRemove(userid,postObj){
 	let allowed = false;
+	if(postObj === undefined) return false;
 
 	if(userid === postObj.author_id) allowed = true;
 	let r = vw.getDatabaseValue("user",userid,"rank");

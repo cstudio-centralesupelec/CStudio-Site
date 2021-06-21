@@ -68,6 +68,7 @@
 	addEventListener('user_ready', async () => {
 		if(app_data.rank === undefined){
 			app_data.page_content = 'main';
+			return;
 		}
 		let my_posts = await get_user_posts(app_data.user_id);
 		app_data.my_posts = my_posts;
