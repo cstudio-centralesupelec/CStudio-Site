@@ -13,8 +13,23 @@ Il utilise Vue pour son frontend
 
 D'abord, vérifier que `Node JS` est installé ansi que `npm`.
 Ensuite, cloner le repo: `git clone [lien du repo]`
+
 Dans le repo, modifier le fichier `config.js` pour correspondre à la situation.
+
 Puis, mettre les certificats `https` du site dans le dossier `cert` sous le nom `privkey.pem `et `cert.pem`.
+
+Voici un exemple de configuration pour faire tourner le site localement:
+````js
+module.exports = {
+	oauth_client_id: "...",
+	oauth_client_secret: "...",
+	port: 80,
+	host: "0.0.0.0",
+	hostname:"http://localhost",
+	debug: true
+};
+```
+
 
 Alors, vous pouvez installer les paquets requis pour faire marcher le site (principalement des trucs liés à sqlite) avec:
 
