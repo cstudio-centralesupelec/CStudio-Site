@@ -72,6 +72,31 @@
 		ctx = canvas.getContext('2d');
 	}
 
+	window.disablevdk = function(){
+		isRenderError = true;
+		document.body.removeChild(canvas);
+		canvas = {fake:true,offsetWidth:1,offsetHeight:1,width:1,height:1,offsetLeft:0,offsetTop:0};
+
+		// needed to make mousex and mousey work.
+		let i = setInterval(() => {
+			if(canvas.fake){
+				let t = document.getElementsByTagName('canvas')[0];
+				if(t !== undefined){
+					canvas = t;
+					clearInterval(i);
+				}
+			}else{
+				clearInterval(i);
+			}
+		},10);
+
+		// dont generate infinite lag if page does not need canvas.
+		setTimeout(() => {
+			clearInterval(i);
+		},1000);
+
+	}
+
 	let score = 0;
 	window.setscore = async function(s){
 		if(s <= score) return; // score should only increase. 
@@ -485,6 +510,10 @@
 
 	// this can only be called after the user has interacted with the page (click, etc...)
 	function setupAudio(){
+		if(isRenderError){
+			audioStarted = true;
+			return;
+		}
 		audio_context = new AudioContext();
 		osc = audio_context.createOscillator();
 		gain = audio_context.createGain();
@@ -497,7 +526,7 @@
 		audioStarted = true;
 	}
 	window.sound = function(freq,volume,fadeout){
-		if(!audioStarted) return;
+		if(!audioStarted || isRenderError) return;
 		volume = volume || .3;
 		osc.frequency.value = freq || 440;
 		fadeout = fadeout || .9;

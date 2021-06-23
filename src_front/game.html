@@ -8,6 +8,8 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=0"/>
 	<script src="client.js"></script>
 	<script src="vdk.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/three@0.99.0/build/three.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/three@0.99.0/examples/js/loaders/GLTFLoader.js"></script>
 </head>
 <body>
 </body>
@@ -17,7 +19,6 @@
 	if(game_id == null){
 		location.href = "/";
 	}
-	console.log(game_id); 
 
 	async function loadGame(game_id){
 		let script = document.createElement('script');
