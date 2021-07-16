@@ -1,7 +1,7 @@
 const express = require('express')
 const session = require('express-session');
 const SQLiteStore = require('connect-sqlite3')(session);
-const VBel = require('./src_back/vbel2/index.js');
+const VBel = require('vbel2');
 const sqlite3 = require('better-sqlite3');
 const config = require('./config.js');
 
@@ -73,8 +73,6 @@ if(!config.debug){
 	// http debug server.
 	server = http.createServer(app);
 }
-
-vw.enableWebsockets(server);
 
 server.listen(config.port || port_default,config.host || "0.0.0.0",() => {
 	console.log(`Website available at ${config.hostname}:${config.port}/`)
