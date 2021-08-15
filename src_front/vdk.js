@@ -23,13 +23,6 @@
 
 		await fetchUserId();
 
-		document.querySelector('canvas').addEventListener('click', () => {
-			if(!audioStarted){
-				setupAudio()
-				audioStarted = true;
-			}
-		},true);
-
 		(window.main || function(){})();
 		drawLoop();
 	}
@@ -503,51 +496,92 @@
 
 	// Audio features
 
-	let audio_context = null;
-	let osc = null;
-	let gain = null;
-	let audioStarted = false;
+	window.sound = function(freq,volume,duration,fadeout){
+		// Generate a wav binary file, convert it to a blob and play it.
+		// https://fr.wikipedia.org/wiki/Waveform_Audio_File_Format#Structure_des_fichiers_WAV
+		
+		// Audio stuff:
+		const sampling = 44100; // in hertz
+		duration = duration || 1; // in seconds
+		const sampleCount = Math.floor(sampling * duration);
 
-	// this can only be called after the user has interacted with the page (click, etc...)
-	function setupAudio(){
-		if(isRenderError){
-			audioStarted = true;
-			return;
+		volume = volume || 0.5;
+		if(volume > 1) volume = 1;
+		if(volume < 0) volume = 0; // clamp
+		volume = Math.floor(volume * 256 * 256); // convert to 16 bit integer
+		
+		freq = freq || 440; // nice default freq 
+
+		// Helper function to build binary files
+		function toBytes(value, bytes) {
+			let result = "";
+			for (; bytes>0; bytes--) {
+				result += String.fromCharCode(value & 255);
+				value >>= 8;
+			}
+			return result;
 		}
-		audio_context = new AudioContext();
-		osc = audio_context.createOscillator();
-		gain = audio_context.createGain();
 
-		gain.gain.value = 0;
-		osc.frequency.value = 440;
-		osc.connect(gain);
-		gain.connect(audio_context.destination);
-		osc.start();
-		audioStarted = true;
-	}
-	window.sound = function(freq,volume,fadeout){
-		if(!audioStarted || isRenderError) return;
-		volume = volume || .3;
-		osc.frequency.value = freq || 440;
-		fadeout = fadeout || .9;
+		let samples = "";
 
-		setTimeout(() => {
-			gain.gain.value = volume;
-			let i = setInterval(() => {
-				gain.gain.value = gain.gain.value * fadeout;
-				if(gain.gain.value < 0.01){
-					gain.gain.value = 0;
-					clearInterval(i);
-				}
-			},5);
-		},50);
-	}
+		// Example of a fade: linear fade.
+		// fadeout = fadeout || ((t,max) => (max-t)/max);
 
-	addEventListener('mousedown', () => {
-		if(!audioStarted){
-			setupAudio();
-			audioStarted = true;
+		// By default, be use a fancy "fast attack, slow descent" fade
+		fadeout = fadeout || ((t,max) => {
+			const attackRatio = 0.01;
+			if(t/max < attackRatio){
+				// fast attack
+				return t/max/attackRatio;
+			}else{
+				// slow descent (linear)
+				return (1-(t/max)) / (1-attackRatio);
+			}
+		});
+
+		for(let i = 0;i < sampleCount;i++){
+			samples += toBytes(
+				(Math.cos(
+					2 * Math.PI * i * freq / sampling
+				)+1)/2 * volume * fadeout(i,sampleCount)
+			,2);
 		}
-	});
+		
+
+		let dataChunk = [
+			"fmt ",
+			"\x10\x00\x00\x00", // 16: chunk length
+			"\x01\x00", // audio format, PCM integer
+			"\x01\x00", // mono
+			toBytes(sampling,4),
+			toBytes(sampling * 2,4), // bytes / sec
+			"\x02\x00", // bytes per bloc
+			"\x10\x00", // bytes per sample
+			"data",
+			toBytes(sampleCount * 2,4),
+			samples
+		].join('');
+
+
+		let wav = [
+			"RIFF",
+			toBytes(20 + dataChunk.length,4),
+			"WAVE",
+			dataChunk
+		].join('');
+
+		let uint8 = new Uint8Array(wav.length);
+		for(let i = 0; i < uint8.length; i++) {
+			uint8[i] = wav.charCodeAt(i);
+		}
+		
+
+		let blob = new Blob([uint8], {type: 'audio/wav'});
+		let audioObject = new Audio();
+		audioObject.src = URL.createObjectURL(blob);
+		audioObject.play();
+		return audioObject;
+	}
+
 
 })();
