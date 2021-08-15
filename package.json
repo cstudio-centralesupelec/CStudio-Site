@@ -24,7 +24,7 @@
     "chownr": "^1.1.4",
     "code-point-at": "^1.1.0",
     "concat-map": "^0.0.1",
-    "connect-sqlite3": "^0.9.11",
+    "connect-sqlite3": "^0.9.12",
     "console-control-strings": "^1.1.0",
     "content-disposition": "^0.5.3",
     "content-type": "^1.0.4",
