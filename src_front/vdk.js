@@ -488,7 +488,7 @@
 		let i = new Image();
 		try{
 			// attempt to load from predefined
-			i.src = "/assets/game/"+src;
+			i.src = location.host + "/q/get_post_file/?post_id=${game_id}&file="+src;
 		}catch(err){
 			// loading any url instead.
 			i.src = src;
