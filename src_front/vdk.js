@@ -381,11 +381,18 @@
 	window.clamp = function(x,a,b){
 		return Math.max(a,Math.min(b,x));
 	}
-	window.rgbTohsv = function(r,g,b){
-
+	// rgb in 0-255, h in 0 - 360, sv in 0-1
+	window.rgb2hsv = function(r,g,b){
+		r /= 255; g/=255; b /= 255;
+		let v=Math.max(r,g,b), c=v-Math.min(r,g,b);
+		let h= c && ((v==r) ? (g-b)/c : ((v==g) ? 2+(b-r)/c : 4+(r-g)/c)); 
+		return {h:60*(h<0?h+6:h), s:v&&c/v, v};
 	}
-	window.hsvTorgb = function(h,s,v){
 
+	// rgb in 0-255, h in 0 - 360, sv in 0-1
+	window.hsv2rgb = function(h,s,v){
+		let f= (n,k=(n+h/60)%6) => (v - v*s*Math.max( Math.min(k,4-k,1), 0)) * 255;     
+  		return {r:f(5),g:f(3),b:f(1)}; 
 	}
 
 	// Random related
@@ -416,25 +423,24 @@
 			return customRandom();
 		}
 	}
+	window.integerHash = function(a,b){
+		const mod = Math.pow(2, 31) - 1;
+		a += 12;
+		let s = ((+b) % mod) ^ ((+a) % mod);
+		for(let i = 0;i < 10;i++){
+			s = nextRandomValue(s);
+		}
+		return (s & 0x3fffffff)/0x3fffffff;;
+	}
 	window.noise = function(x,y){
 		// generate 4 random values for lerp:
 		let xint = Math.floor(x);
 		let yint = Math.floor(y);
-		
-		let rand2F = function(a,b){
-			const mod = Math.pow(2, 31) - 1;
-			a += seed1;
-			let s = ((+b) % mod) ^ ((+a) % mod);
-			for(let i = 0;i < 10;i++){
-				s = nextRandomValue(s);
-			}
-			return (s & 0x3fffffff)/0x3fffffff;;
-		}
 
 		let xfrac = x-xint;
 		let yfrac = y-yint;
-		let v1 = smoothlerp(rand2F(xint,yint),rand2F(xint+1,yint),xfrac);
-		let v2 = smoothlerp(rand2F(xint,yint+1),rand2F(xint+1,yint+1),xfrac);
+		let v1 = smoothlerp(integerHash(xint,yint),integerHash(xint+1,yint),xfrac);
+		let v2 = smoothlerp(integerHash(xint,yint+1),integerHash(xint+1,yint+1),xfrac);
 		return smoothlerp(v1,v2,yfrac);
 	}
 
