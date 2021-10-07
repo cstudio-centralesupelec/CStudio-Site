@@ -3,7 +3,28 @@ const session = require('express-session');
 const SQLiteStore = require('connect-sqlite3')(session);
 const VBel = require('vbel2');
 const sqlite3 = require('better-sqlite3');
+
 const config = require('./config.js');
+
+/*
+ config contient la configuration du serveur.
+ elle n'est pas dans git car elle contient des secrets (comme l'oauth pour la connexion avec linkcs, etc...)
+ elle ressemble à ça:
+
+module.exports = {
+	oauth_client_id: " ... ",
+	oauth_client_secret: " ... ",
+	port: 443,
+	host: "0.0.0.0",
+	hostname:"https://cstudio.cs-campus.fr",
+	debug: false,
+	certDir: "cert"
+};
+
+ Pour développer le site, met debug à true !
+
+*/
+
 
 const https = require('https');
 const http = require('http');
@@ -30,6 +51,8 @@ let vconfig = {
 global.vw = new VBel(vconfig);
 global.app = express();
 global.config = config;
+
+config.certDir = config.certDir || "cert";
 
 app.use(express.json());
 app.use(session({
@@ -61,9 +84,15 @@ if(!config.debug){
 		res.end();
 	});
 
+	// formerly: 'cert/privkey.pem'
+	let key = config.certDir + "/privkey.pem";
+	// formerly: 'cert/cert.pem'
+	// don't use the old certificates ! They are expired !
+	let cert = config.certDir + "/cert.pem"
+
 	const options = {
-		key: fs.readFileSync('cert/privkey.pem'),
-		cert: fs.readFileSync('cert/cert.pem')
+		key: fs.readFileSync(key),
+		cert: fs.readFileSync(cert)
 	};
 	server = https.createServer(options,app);
 

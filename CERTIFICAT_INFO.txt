@@ -1,0 +1,26 @@
+Salut, je suis CERTIFICAT_INFO.txt
+
+Je suis un fichier texte. Mon travail est de t'expliquer c'est quoi un certificat https et comment le renouveler !
+
+Comme tu as pu le constater, cstudio.cs-campus.fr est un site en https.
+Pour profiter de toute la sécurité incroyable offerte par le https, il faut un certificat.
+
+Un certificat est un couple de fichier avec une partie privée et une partie publique.
+Les certificats expirent après une durée de 3 mois, il faut donc les renouveler tous les 3 mois pour que le site marche.
+
+Si les certificats ne sont pas renouvelé, le site va marcher mais pour y accéder, il y aura une grosse erreur "CE SITE EST DANGEREUX" qui
+va être affiché et qui va faire peur aux visiteurs.
+
+Pour renouveler un certificat, on va utiliser un programme qui s'appelle certbot. C'est un bot pour les certificats:
+On entre les commandes suivantes:
+
+- sudo certbot certonly
+- On choisit l'option "Place files in webroot directory": on utilise le serveur existant pour valider le certificat !
+- Pour le nom de domaine, on entre: cstudio.cs-campus.fr
+- Pour le "webroot directory", on entre le chemin vers le dossier avec les fichiers statiques du serveur: /home/debian/CStudio-Site/static/
+- Le certificat est renouvellé !
+
+Pour que le serveur utilise le nouveau certificat, il faut le redémarrer avec:
+- sudo pm2 restart server
+
+Voilà, c'est tout !
